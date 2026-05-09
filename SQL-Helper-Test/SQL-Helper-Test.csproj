@@ -2,14 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>CSharp_Test</RootNamespace>
+    <RootNamespace>BiemannT.SQLHelper.Test</RootNamespace>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>BiemannT.SQLHelper.Test</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MSTest" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SQL-Helper\SQL-Helper.csproj" />
   </ItemGroup>
 
   <ItemGroup>
