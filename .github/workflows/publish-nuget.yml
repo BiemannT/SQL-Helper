@@ -21,7 +21,7 @@ jobs:
       issues: write
 
     env:
-      projFolder: CSharp-Template #Hier den Ordner angeben, in dem sich die .csproj-Datei befindet dessen Paket veröffentlicht werden soll
+      projFolder: SQL-Helper #Hier den Ordner angeben, in dem sich die .csproj-Datei befindet dessen Paket veröffentlicht werden soll
 
     if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
 
