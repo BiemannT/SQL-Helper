@@ -1,0 +1,13 @@
+name: SQL-Helper-Test
+services:
+  sql-2017:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Express
+      - MSSQL_MEMORY_LIMIT_MB=1024
+      - MSSQL_SA_PASSWORD=Sql2Admin
+
+    ports:
+      - "1433:1433"
