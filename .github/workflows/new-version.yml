@@ -1,0 +1,68 @@
+name: Create new version
+run-name: ${{ github.actor }} creates new version
+on:
+  workflow_dispatch:
+    inputs:
+      MajVers:
+        description: 'Hauptversion'
+        required: true
+        type: number
+
+      MinVers:
+        description: 'Nebenversion'
+        required: true
+        type: number
+
+      PatchVers:
+        description: 'Patchversion'
+        required: true
+        type: number
+
+jobs:
+  create-version:
+    runs-on: ubuntu-latest
+    env:
+      VersTag: v${{ inputs.MajVers }}.${{ inputs.MinVers }}.${{ inputs.PatchVers }}
+
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Initialisierung
+        run: echo "Neue Version $VersTag anlegen."
+
+      - name: Meilenstein erstellen
+        env:
+          GH_TOKEN : ${{ github.token }}
+        run: |
+          gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/${{ github.repository }}/milestones \
+          -f "title=$VersTag" \
+          -f "description=## Neuerungen
+          + xyz
+
+          ## Fehlerbehebungen
+          + xyz"
+
+      - name: Repository abrufen
+        uses: actions/checkout@v6
+
+      - name: Issue Anpassung Versionsnummer
+        env:
+          GH_TOKEN : ${{ github.token }}
+        run: |
+          gh issue create \
+          --title "Versionsnummer auf $VersTag anpassen" \
+          --body "Die Versionsnummer in den entsprechenden Projektdateien auf $VersTag anpassen." \
+          --milestone "$VersTag"
+
+      - name: Branch erzeugen
+        run: "git checkout -b $VersTag"
+
+      - name: Branch veröffentlichen
+        run: "git push --set-upstream origin $VersTag"

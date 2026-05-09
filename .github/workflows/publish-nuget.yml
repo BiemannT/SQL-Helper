@@ -1,0 +1,90 @@
+name: Publish NuGet Package on GitHub
+on:
+  pull_request:
+    types:
+      - closed
+    
+    branches:
+      - main
+      
+  workflow_dispatch:
+
+jobs:
+  publish-nuget:
+    name: Publish NuGet Package
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+      issues: write
+
+    env:
+      projFolder: CSharp-Template #Hier den Ordner angeben, in dem sich die .csproj-Datei befindet dessen Paket veröffentlicht werden soll
+
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Repository abrufen
+        uses: actions/checkout@v6
+
+      - name: Infos Meilenstein abrufen
+        id: Mile
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Prüfen, ob mit dem Pull-Request ein Meilenstein mit Versionsnummer verbunden ist"
+          echo "TITLE=$(gh pr view ${{ github.event.number }} --json milestone --jq .milestone.title)" >> "$GITHUB_OUTPUT"
+          echo "NUM=$(gh pr view ${{ github.event.number }} --json milestone --jq .milestone.number)" >> "$GITHUB_OUTPUT"
+
+      - name: Tag prüfen
+        if: ${{ steps.Mile.outputs.TITLE != '' }}
+        id: CheckTag
+        uses: kaisugi/action-regex-match@v1.0.2
+        with:
+          text: ${{ steps.Mile.outputs.TITLE }}
+          regex: '^v[0-9]+.[0-9]+.[0-9]+$'
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: GitHub Package registrieren
+        run: dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+      - name: Abhängigkeiten wiederherstellen
+        run: dotnet restore
+
+      - name: Projekt bauen
+        run: dotnet build --no-restore --configuration Release
+
+      - name: NuGet-Paket erstellen
+        run: dotnet pack ${{ env.projFolder }}/*.csproj --no-build --no-restore --configuration Release --output ./nupkg
+
+      - name: NuGet-Paket veröffentlichen
+        run: dotnet nuget push ./nupkg/*.nupkg --source github --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Release erstellen
+        if: ${{ steps.CheckTag.outputs.match != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES=$(gh pr view ${{ github.event.number }} --json milestone --jq .milestone.description)
+          gh release create ${{ steps.Mile.outputs.TITLE }} --title ${{ steps.Mile.outputs.TITLE }} --notes "$NOTES"
+
+      - name: Meilenstein schließen
+        if: ${{ steps.Mile.outputs.NUM != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+          --method PATCH \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/${{ github.repository }}/milestones/${{ steps.Mile.outputs.NUM }} \
+          -f "state=closed"

@@ -1,0 +1,42 @@
+name: Link Pull Request to Milestone
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+
+    branches:
+      - main
+
+jobs:
+  link-pr:
+    name: Pull Request verknüpfen
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v6
+
+      - name: Verfügbare Meilensteine abrufen
+        id: AllMilestones
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "MILESTONES=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api_version: 2022-11-28" \
+            /repos/${{ github.repository }}/milestones?state=all \
+            | jq --compact-output '[.[] | {title: .title}]')" >> "$GITHUB_OUTPUT"
+
+          echo "Zielbranch: ${{github.base_ref }}"
+          echo "Mergebranch: ${{ github.head_ref }}"
+
+      - name: PR verlinken
+        if: ${{ contains(fromJson(steps.AllMilestones.outputs.MILESTONES).*.title, github.head_ref) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit ${{ github.event.number }} --milestone ${{ github.head_ref }}
