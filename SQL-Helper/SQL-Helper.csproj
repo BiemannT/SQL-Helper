@@ -8,16 +8,18 @@
     <Version>1.0.0</Version>
     <Authors>Tobias Biemann</Authors>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/BiemannT/CSharp-Template.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/BiemannT/SQL-Helper.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright © Tobias Biemann 2025</Copyright>
-    <Description>Description of the project.</Description>
-    <PackageTags>Tag1;Tag2</PackageTags>
-    <RootNamespace>BiemannT.CSharp</RootNamespace>
-    <PackageId>BiemannT.CSharp</PackageId>
-    <AssemblyName>BiemannT.CSharp</AssemblyName>
+    <Copyright>Copyright © Tobias Biemann 2026</Copyright>
+    <Description>.NET helper class for communicating with the MS SQL Server.</Description>
+    <PackageTags>wrapper;sql;sql-server;net8;net9;net10</PackageTags>
+    <RootNamespace>BiemannT.SQLHelper</RootNamespace>
+    <PackageId>BiemannT.SQLHelper</PackageId>
+    <AssemblyName>BiemannT.SQLHelper</AssemblyName>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Title>SQL-Helper</Title>
+    <PackageProjectUrl>https://github.com/BiemannT/SQL-Helper</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0|AnyCPU'">
