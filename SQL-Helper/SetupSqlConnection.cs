@@ -621,6 +621,18 @@ namespace BiemannT.SQLHelper
 
                 try
                 {
+                    // Zuerst prüfen, ob diese IP-Adresse und Port-Nummer überhaupt erreichbar ist
+                    using TcpClient tcpClient = new();
+                    try
+                    {
+                        tcpClient.Connect(targetIP.AddressList[i], this.ServerPort);
+                    }
+                    catch (SocketException)
+                    {
+                        // Verbindungsfehler auf TCP-Ebene, z.B. Zeitüberschreitung oder Zielhost nicht erreichbar
+                        throw new CheckConnectionException($"Unable to connect to the SQL Server '{targetIP.AddressList[i]}:{this.ServerPort}'.", CheckConnectionExceptionType.ConnectionTimeout);
+                    }
+
                     // Versuche die Verbindung zu öffnen
                     using SqlConnection sqlConn = OpenConnection(connInfo);
 
