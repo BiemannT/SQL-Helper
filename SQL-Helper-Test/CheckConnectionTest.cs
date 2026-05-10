@@ -162,6 +162,11 @@ namespace BiemannT.SQLHelper.Test
                 if ((int)ex.ExceptionType != expectedErrorType)
                 {
                     // Der aufgetretene Fehler entspricht nicht dem erwarteten Fehler
+                    TestContext.WriteLine($"Der aufgetretene Fehler entspricht nicht dem erwarteten Fehler. {ex.Message}");
+                    if (ex.InnerException != null)
+                    {
+                        TestContext.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                    }
                     Assert.Fail($"Es wurde ein Fehler vom Typ {expectedErrorType} erwartet, aber es ist ein Fehler vom Typ {ex.ExceptionType} aufgetreten.");
                 }
                 else
