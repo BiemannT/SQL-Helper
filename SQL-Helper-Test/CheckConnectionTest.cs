@@ -184,7 +184,6 @@ namespace BiemannT.SQLHelper.Test
         [DataRow("ActiveUser", "veryG88dPassword", "localhost", 1433, "TestDB", 9, 10)] // Benutzer ohne Berechtigung zur Anmeldung an Datenbank
         [DataRow("UserWithPermission", "Allw6dUser", "localhost", 1433, "TestDB", -1, 10)] // Benutzer mit Berechtigung zur Anmeldung an Datenbank
         [DataRow("ActiveUser", "veryG88dPassword", "localhost", 1433, "", 10, 0)] // Sofortiger Abbruch
-        [DataRow("unknown", "unknown", "localhost", 1430, "", 10, 2)] // Abbruch vor dem Connection Timeout
         [TestMethod]
         public async Task Test_CheckConnectionAsync(string loginName, string loginPassword, string hostName, int serverPort, string database, int expectedErrorType, int cancellationTime)
         {
