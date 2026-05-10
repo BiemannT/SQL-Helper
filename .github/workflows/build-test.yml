@@ -13,6 +13,24 @@ jobs:
     permissions:
       contents: read
 
+    ### Abweichend zur Vorlage wird hier der SQL-Server eingerichtet.
+    
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+
+        ports:
+          - 1433:1433
+
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_PID: Express
+          MSSQL_LCID: 1031
+          MSSQL_MEMORY_LIMIT_MB: 1024
+          MSSQL_SA_PASSWORD: Sql2Admin
+
+    ### Ende Abweichung
+
     steps:
       - name: Repository abrufen
         uses: actions/checkout@v6
