@@ -728,6 +728,23 @@ namespace BiemannT.SQLHelper
 
                 try
                 {
+                    // Zuerst prüfen, ob diese IP-Adresse und Port-Nummer überhaupt erreichbar ist
+                    using TcpClient tcpClient = new();
+
+                    try
+                    {
+                        await tcpClient.ConnectAsync(targetIP.AddressList[i], this.ServerPort, cancellation.GetValueOrDefault());
+                    }
+                    catch (SocketException)
+                    {
+                        throw new CheckConnectionException($"Unable to connect to the SQL Server '{targetIP.AddressList[i]}:{this.ServerPort}'.", CheckConnectionExceptionType.ConnectionTimeout);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Abbruch angefordert
+                        throw new CheckConnectionException("The connection to the SQL Server was canceled.", CheckConnectionExceptionType.RequestCancelled);
+                    }
+
                     // Versuche die Verbindung zu öffnen
                     using SqlConnection sqlConn = await OpenConnectionAsync(cancellation, connInfo);
 
